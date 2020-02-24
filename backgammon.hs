@@ -10,12 +10,9 @@ main :: IO ()
 
 main = undefined
 
-{-printGameState [Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,White 6 5,Empty 7 0,White 8 3,
-Empty 9 0,Empty 10 0,Empty 11 0,White 12 5,Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3,
-Empty 18 0,Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,White 24 2]-}
---printGameState' :: Board
---printGameState' = [Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,White 6 5,Empty 7 0,White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,White 12 5,Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3,Empty 18 0,Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,White 24 2]
-
+{-EX:
+printGameState = [Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,White 6 5,Empty 7 0,White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,White 12 5,Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3,Empty 18 0,Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,White 24 2]
+-}
 printGameState :: Board -> IO ()
 
 printGameState ((Empty position checkers):[]) = do 
@@ -44,17 +41,13 @@ findTriangle (Black _ _ :(triangles)) n = undefined
 {-validTriangle [White 12 5,Black 13 1,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3] (White 17 4) 4-}
 validTriangle :: Board -> Triangle -> Move -> Maybe (Int)
 
-validTriangle (((_ position1 checkers1)):[]) (White position checkers) n =
-  if validMove ((_ position1 checkers1) && (position - n) == position1) then Just (position - n)
+validTriangle (triangle:[]) (White position checkers) n =
+  if validMove triangle && (position - n) == findPosition triangle then Just (position - n)
   else Nothing
-validTriangle (((_ position1 checkers1)):triangles) (White position checkers) n =
-  if validMove (_ position1 checkers1) && (position - n) == position1) then Just (position - n)
+validTriangle (triangle:triangles) (White position checkers) n =
+  if validMove triangle && (position - n) == findPosition triangle then Just (position - n)
   else validTriangle triangles (White position checkers) n
-  
-  --if (Empty (position - n) 0) `elem` triangles || (Black (position - n) 1) `elem` triangles then Just (position - n) 
-  --else Nothing 
 
--- (White (position - n) checkers) `elem` triangles || 
 
 findPosition :: Triangle -> Position
 findPosition (White position checkers) = position
