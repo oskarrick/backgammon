@@ -1,20 +1,30 @@
-data Checkers = Black | White deriving (Show,Eq)
+type Position = Int
+type Move = Int
+type AmountCheckers = Int
+data Triangle = Empty Position Checkers | Checkers Position AmountCheckers | Checkers Position AmountCheckers
+  deriving (Eq, Show)
+type Board = [Triangle]
 
-type Board = (Int, [Checkers])
+Checkers = Black | White deriving (Show,Eq)
 
-canMove :: Checkers -> Board -> Bool
-canMove _ (_,[]) = True
-canMove White (x,l) | White == head l && x > 12 = True
-                    | White == head l && x <= 12 = False
-                    | [Black] == l = True
-                    | otherwise = False
-canMove Black (x,l) | Black == head l && x <= 12 = True
-                    | Black == head l && x > 12 = False
-                    | [White] == l = True
-                    | otherwise = False
+--type Board = (Int, [Checkers])
 
+validMove :: Checkers -> Board -> Bool
+validMove _ (Empty _ _) = True
+validMove White (check pos amount) | White == check && pos > 12 = True
+                                   | White == check && pos <= 12 = False
+                                   | Black == check && amount < 2 = True
+                                   | otherwise = False
+validMove Black (check pos amount) | Black == check && pos <= 12 = True
+                                   | Black == check && pos > 12 = False
+                                   | White == check && amount < 2 = True
+                                   | otherwise = False
+
+
+{-
 canMove2 :: Checkers -> Board -> Int -> Bool
 canMove2 White (x,l) dice | (x+dice) > 24 = False
                           | otherwise = True
 canMove2 Black (x,l) dice | x < 13 && (x+dice) > 12 = False
                           | otherwise = True
+-}
