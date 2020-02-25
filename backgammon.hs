@@ -4,6 +4,7 @@ type Checkers = Int
 data Triangle = Empty Position Checkers | White Position Checkers | Black Position Checkers
   deriving (Eq, Show)
 type Board = [Triangle]
+data State = Running | GameOver (Maybe Player) deriving (Eq, Show)
 
 
 main :: IO ()
