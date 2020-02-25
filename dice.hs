@@ -27,3 +27,9 @@ startGame = do
     if number1 > number2 then putStrLn ("Player 1 starts!")
     else if number2 > number1 then putStrLn ("Player 2 starts!")
     else startGame
+
+calculateMoves = do 
+    number <- randomRIO (1,6) :: IO Int
+    number2 <- randomRIO (1,6) :: IO Int
+    if number == number2 then return [number, number, number, number]
+        else return [number,number2]
