@@ -12,7 +12,7 @@ main :: IO ()
 main = undefined
 
 {-EX:
-printGameState = [Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,White 6 5,Empty 7 0,White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,White 12 5,Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3,Empty 18 0,Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,White 24 2]
+printGameState [Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,White 6 5,Empty 7 0,White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,White 12 5,Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3,Empty 18 0,Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,White 24 2]
 -}
 printGameState :: Board -> IO ()
 
