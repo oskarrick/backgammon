@@ -56,6 +56,18 @@ checkerOptions a@Black (x:xs) = if isCheckerBlack x
                                 then x :(checkerOptions a xs)
                                 else checkerOptions a xs
 
+chooseChecker :: Board -> IO Triangle
+chooseChecker chkrs = do
+  putStrLn $ "Choose a checker (1-" ++ show (length chkrs) ++")"
+  checker <- getLine
+  if read checker > length chkrs || read checker < 1
+    then chooseChecker chkrs
+    else return $ chosenChecker chkrs (read checker)
+
+
+chosenChecker :: Board -> Int -> Triangle
+chosenChecker (x:xs) 1 = x
+chosenChecker (x:xs) n = chosenChecker xs (n-1)
 
 isCheckerWhite :: Triangle -> Bool
 isCheckerWhite (Checker White _ _) = True
