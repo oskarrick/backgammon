@@ -1,3 +1,7 @@
+module Rules
+( validMove
+) where
+
 type Position = Int
 type Move = Int
 type AmountCheckers = Int
