@@ -31,5 +31,5 @@ startGame = do
 calculateMoves = do 
     number <- randomRIO (1,6) :: IO Int
     number2 <- randomRIO (1,6) :: IO Int
-    if number == number2 then return [number, number, number, number]
+    if number == number2 then return [number, number, number2, number2]
         else return [number,number2]
