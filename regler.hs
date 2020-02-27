@@ -1,7 +1,11 @@
+module Rules
+( validMove
+) where
+
 type Position = Int
 type Move = Int
 type AmountCheckers = Int
-data Triangle = Empty Position Checkers | Checkers Position AmountCheckers | Checkers Position AmountCheckers
+data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers
   deriving (Eq, Show)
 type Board = [Triangle]
 
@@ -9,14 +13,14 @@ data Checkers = Black | White deriving (Show,Eq)
 
 --type Board = (Int, [Checkers])
 
-validMove :: Checkers -> Board -> Bool
+validMove :: Triangle -> Triangle -> Bool
 validMove _ (Empty _ _) = True
-validMove White (check pos amount) | White == check = True
-                                   | Black == check && amount < 2 = True
-                                   | otherwise = False
-validMove Black (check pos amount) | Black == check = True
-                                   | White == check && amount < 2 = True
-                                   | otherwise = False
+validMove (Checker White _ _) (Checker check pos amount) | White == check = True
+                                                         | Black == check && amount < 2 = True
+                                                         | otherwise = False
+validMove (Checker Black _ _) (Checker check pos amount) | Black == check = True
+                                                         | White == check && amount < 2 = True
+                                                         | otherwise = False
 
 
 
