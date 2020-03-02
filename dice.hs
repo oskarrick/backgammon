@@ -60,20 +60,3 @@ chooseDice = do
     dice <- readLn
     if (dice :: Int) `elem` dices then return dice
     else chooseDice
-
-dices = [2,3]
-
-data Menu menu
-
-menu :: IO ()
-menu = do
-    putStrLn ("MENU")
-    putStrLn ("1. Start game")
-    putStrLn ("2. Quit")
-    choice <- getLine
-    if choice == "1" then startGame
-    else if choice == "2" then return ()
-    else menu
-
-start color gamestate = do 
-    calculateMoves
