@@ -1,3 +1,23 @@
+module Backgammon (
+  newGameState
+ ,printGameState
+ ,moveBlackChecker
+ ,moveChecker'
+ ,position
+ ,checkerOptions
+ ,chooseChecker
+ ,chosenChecker
+ ,isCheckerWhite
+ ,isCheckerBlack
+ ,findTriangle
+ ,validTriangle
+ ,findPosition
+ ,chooseAMove
+ ,validMove
+ ,playMove
+ ,playMove'
+) where
+
 import Regler
 
 type Position = Int
@@ -7,7 +27,6 @@ data Checkers = Black | White deriving (Show,Eq)
 data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers
   deriving (Eq, Show)
 type Board = [Triangle]
-data State = Running | GameOver (Maybe Player) deriving (Eq, Show)
 
 
 main :: IO ()
@@ -62,7 +81,7 @@ moveBlackChecker dices a@(x:xs) = do
 
   return expression
 
-moveChecker' a (pos + dice) (x:xs)
+--moveChecker' a (pos + dice) (x:xs)
 
 moveChecker' :: Triangle -> Int -> Board -> Triangle
 moveChecker' a pos (x:xs) | not pos == position x = moveChecker' a pos xs
@@ -72,15 +91,6 @@ moveChecker' a pos (x:xs) | not pos == position x = moveChecker' a pos xs
 position :: Triangle -> Int
 position (Checker _ pos _) = pos
 position (Empty pos _) = pos
-
-chooseDice :: [Int] -> IO Int
-chooseDice x = do
-  putStrLn $ "Choose a dice " ++ show x
-  dice <- getLine
-  if read dice `elem` x
-    then return $ read dice
-    else chooseDice x
-
 
 {- checkerOptions
    Shows which checkers can, potentially, be moved
@@ -114,7 +124,7 @@ isCheckerWhite _ = False
 isCheckerBlack :: Triangle -> Bool
 isCheckerBlack (Checker Black _ _) = True
 isCheckerBlack _ = False
-
+{--
 
 findTriangle :: Board -> Int -> IO ()
 findTriangle (Checker Black _ _ :(triangles)) n = undefined
@@ -152,12 +162,4 @@ playMove (Checker White position checkers) n = Checker White position (checkers 
 
 playMove' :: Triangle -> Move -> Triangle
 playMove' (Checker White position checkers) n = Checker White (position + n) (checkers + 1)
-
-askContinue :: IO ()
-askContinue = do
-    putStrLn "Start a new game? (Yes or No)"
-    str <- getLine
-    if (str == "Yes") then main
-    else do
-        if (str == "No") then do (return ())
-        else askContinue
+--}
