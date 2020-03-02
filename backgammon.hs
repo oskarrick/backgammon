@@ -1,4 +1,5 @@
 --import Regler
+import Dice
 
 type Position = Int
 type Move = Int
@@ -13,8 +14,10 @@ type Board = [Triangle]
 main :: IO ()
 
 main = do
-  board <- moveChecker Black [1,2] newGameState
-  printGameState board
+  dices <- calculateMoves
+  dice <- chooseDice dices
+  ... --move
+  dada <- delete dice dices
 
 {- newGameState
    Constructs the board as it is at the beginning of the game
@@ -59,16 +62,23 @@ moveChecker :: Checkers -> [Int] -> Board -> IO Board
 moveChecker checker dices a@(x:xs) = do
   tri <- chooseChecker (checkerOptions checker (x:xs))
   dice <- chooseDice dices
-  newPos <- if checker == Black then moveChecker' tri (position tri+dice) a else moveChecker' tri (position tri-dice) a
+  newPos <- if checker == Black
+              then moveChecker' tri (position tri+dice) a
+              else moveChecker' tri (position tri-dice) a
   if validMove tri newPos
-    then return (insert checker tri a (position newPos))
+    then if checker == Black
+      then return (insert Black tri a (position newPos))
+      else return (reverse (insert White tri a 0))
     else moveChecker checker dices a
 
 insert :: Checkers -> Triangle -> Board -> Int -> Board
-insert checker tri ((Empty pos _):xs) 1 = (Checker checker pos 1):xs
-insert checker tri ((Checker checker2 pos amount2):xs) 1 | checker == checker2 = (Checker checker pos (amount2+1)):xs
-                                                         | otherwise = (Checker checker pos 1):xs
-insert checker tri@(Checker checker2 pos amount) (x:xs) acc | tri == x && amount < 2 = (Empty pos 0):(insert checker tri xs (acc-1))
+insert White tri ((Empty pos _):xs) x = ((Checker White pos 1):xs)
+insert White tri ((Checker checker2 pos amount):xs) x | White == checker2 = ((Checker White pos (amount+1)):xs)
+                                                      | otherwise = ((Checker White pos 1):xs)
+insert Black tri ((Empty pos _):xs) 1 = (Checker Black pos 1):xs
+insert Black tri ((Checker checker2 pos amount):xs) 1 | Black == checker2 = (Checker Black pos (amount+1)):xs
+                                                      | otherwise = (Checker Black pos 1):xs
+insert Black tri@(Checker checker2 pos amount) (x:xs) acc | tri == x && amount < 2 = (Empty pos 0):(insert checker tri xs (acc-1))
                                                             | tri == x = (Checker checker2 pos (amount-1)):(insert checker tri xs (acc-1))
                                                             | otherwise = x : insert checker tri xs (acc-1)
 
