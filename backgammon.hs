@@ -1,5 +1,24 @@
---import Regler
---import Dice
+module Backgammon (
+  newGameState
+ ,printGameState
+ ,moveBlackChecker
+ ,moveChecker'
+ ,position
+ ,checkerOptions
+ ,chooseChecker
+ ,chosenChecker
+ ,isCheckerWhite
+ ,isCheckerBlack
+ ,findTriangle
+ ,validTriangle
+ ,findPosition
+ ,chooseAMove
+ ,validMove
+ ,playMove
+ ,playMove'
+) where
+
+import Regler
 
 type Position = Int
 type Move = Int
@@ -95,15 +114,6 @@ position :: Triangle -> Int
 position (Checker _ pos _) = pos
 position (Empty pos _) = pos
 
-chooseDice :: [Int] -> IO Int
-chooseDice x = do
-  putStrLn $ "Choose a dice " ++ show x
-  dice <- getLine
-  if read dice `elem` x
-    then return $ read dice
-    else chooseDice x
-
-
 {- checkerOptions
    Shows which checkers can, potentially, be moved
 -}
@@ -137,7 +147,7 @@ isCheckerWhite _ = False
 isCheckerBlack :: Triangle -> Bool
 isCheckerBlack (Checker Black _ _) = True
 isCheckerBlack _ = False
-
+{--
 
 findTriangle :: Board -> Int -> IO ()
 findTriangle (Checker Black _ _ :(triangles)) n = undefined
@@ -185,12 +195,4 @@ playMove (Checker White position checkers) n = Checker White position (checkers 
 
 playMove' :: Triangle -> Move -> Triangle
 playMove' (Checker White position checkers) n = Checker White (position + n) (checkers + 1)
-
-askContinue :: IO ()
-askContinue = do
-    putStrLn "Start a new game? (Yes or No)"
-    str <- getLine
-    if (str == "Yes") then main
-    else do
-        if (str == "No") then do (return ())
-        else askContinue
+--}
