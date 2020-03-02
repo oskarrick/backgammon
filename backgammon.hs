@@ -28,15 +28,6 @@ data Triangle = Empty Position AmountCheckers | Checker Checkers Position Amount
   deriving (Eq, Show)
 type Board = [Triangle]
 
-
-main :: IO ()
-
-main = do
-  dices <- calculateMoves
-  dice <- chooseDice dices
-  ... --move
-  dada <- delete dice dices
-
 {- newGameState
    Constructs the board as it is at the beginning of the game
 -}
