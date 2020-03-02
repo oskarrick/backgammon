@@ -1,4 +1,4 @@
-module Rules
+module Regler
 ( validMove
 ) where
 
