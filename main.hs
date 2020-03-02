@@ -16,17 +16,7 @@ main = do
     choice <- getLine
     if choice == "1" then startGame
     else if choice == "2" then return ()
-    else menu
-
-menu :: IO ()
-menu = do
-    putStrLn ("MENU")
-    putStrLn ("1. Start game")
-    putStrLn ("2. Quit")
-    choice <- getLine
-    if choice == "1" then startGame
-    else if choice == "2" then return ()
-    else menu
+    else main
 
 startGame :: IO ()
 startGame = do 
