@@ -31,7 +31,11 @@ type Board = [Triangle]
 
 main :: IO ()
 
-main = undefined
+main = do
+  dices <- calculateMoves
+  dice <- chooseDice dices
+  ... --move
+  dada <- delete dice dices
 
 {- newGameState
    Constructs the board as it is at the beginning of the game
@@ -72,21 +76,39 @@ moveCheckers checker board (x:xs) = do
   move <- chooseChecker (checkerOptions checker board) chooseDice (x:xs)
 -}
 
-moveBlackChecker :: [Int] -> Board -> IO Board
-moveBlackChecker dices a@(x:xs) = do
-  checker <- chooseChecker a
+moveChecker :: Checkers -> [Int] -> Board -> IO Board
+moveChecker checker dices a@(x:xs) = do
+  tri <- chooseChecker (checkerOptions checker (x:xs))
   dice <- chooseDice dices
-  
+  newPos <- if checker == Black
+              then moveChecker' tri (position tri+dice) a
+              else moveChecker' tri (position tri-dice) a
+  if validMove tri newPos
+    then if checker == Black
+      then return (insert Black tri a (position newPos))
+      else return (reverse (insert White tri a 0))
+    else moveChecker checker dices a
 
-
-  return expression
+insert :: Checkers -> Triangle -> Board -> Int -> Board
+insert White tri ((Empty pos _):xs) x = ((Checker White pos 1):xs)
+insert White tri ((Checker checker2 pos amount):xs) x | White == checker2 = ((Checker White pos (amount+1)):xs)
+                                                      | otherwise = ((Checker White pos 1):xs)
+insert Black tri ((Empty pos _):xs) 1 = (Checker Black pos 1):xs
+insert Black tri ((Checker checker2 pos amount):xs) 1 | Black == checker2 = (Checker Black pos (amount+1)):xs
+                                                      | otherwise = (Checker Black pos 1):xs
+insert Black tri@(Checker checker2 pos amount) (x:xs) acc | tri == x && amount < 2 = (Empty pos 0):(insert checker tri xs (acc-1))
+                                                            | tri == x = (Checker checker2 pos (amount-1)):(insert checker tri xs (acc-1))
+                                                            | otherwise = x : insert checker tri xs (acc-1)
 
 --moveChecker' a (pos + dice) (x:xs)
 
-moveChecker' :: Triangle -> Int -> Board -> Triangle
-moveChecker' a pos (x:xs) | not pos == position x = moveChecker' a pos xs
-                          | pos == position x = x
-                          | otherwise = x
+moveChecker' :: Triangle -> Int -> Board -> IO Triangle
+moveChecker' a pos (x:xs) = do
+  if not (pos == position x)
+    then moveChecker' a pos xs
+    else if pos == position x
+      then return (x)
+      else return (x)
 
 position :: Triangle -> Int
 position (Checker _ pos _) = pos
@@ -107,6 +129,7 @@ checkerOptions a@Black (x:xs) = if isCheckerBlack x
 chooseChecker :: Board -> IO Triangle
 chooseChecker chkrs = do
   putStrLn $ "Choose a checker (1-" ++ show (length chkrs) ++")"
+  print chkrs
   checker <- getLine
   if read checker > length chkrs || read checker < 1
     then chooseChecker chkrs
@@ -129,15 +152,16 @@ isCheckerBlack _ = False
 findTriangle :: Board -> Int -> IO ()
 findTriangle (Checker Black _ _ :(triangles)) n = undefined
 
-{-validTriangle [White 12 5,Black 13 1,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3] (White 17 4) 4-}
+{-validTriangle [White 12 5,Black 13 1,Empty 14 0,Empty 15 0,Empty 16 0,Black 17 3] (White 17 4) 4
 validTriangle :: Board -> Triangle -> Move -> Maybe (Int)
+-}
 
-validTriangle (triangle:[]) (Checker White position checkers) n =
-  if Main.validMove triangle && (position - n) == findPosition triangle then Just (position - n)
-  else Nothing
-validTriangle (triangle:triangles) (Checker White position checkers) n =
-  if Main.validMove triangle && (position - n) == findPosition triangle then Just (position - n)
-  else validTriangle triangles (Checker White position checkers) n
+--validTriangle (triangle:[]) (Checker White position checkers) n =
+  --if Main.validMove triangle && (position - n) == findPosition triangle then Just (position - n)
+  --else Nothing
+--validTriangle (triangle:triangles) (Checker White position checkers) n =
+  --if Main.validMove triangle && (position - n) == findPosition triangle then Just (position - n)
+  --else validTriangle triangles (Checker White position checkers) n
 
 
 findPosition :: Triangle -> Position
@@ -151,12 +175,21 @@ chooseAMove move = do
     choice <- getLine
     return ()
 
+validMove :: Triangle -> Triangle -> Bool
+validMove _ (Empty _ _) = True
+validMove (Checker White _ _) (Checker check pos amount) | White == check = True
+                                                         | Black == check && amount < 2 = True
+                                                         | otherwise = False
+validMove (Checker Black _ _) (Checker check pos amount) | Black == check = True
+                                                         | White == check && amount < 2 = True
+                                                         | otherwise = False
+{-
 validMove :: Triangle -> Bool
 validMove (Empty _ _) = True
 validMove (Checker White _ _) = True
 validMove (Checker Black _ 1) = True
 validMove (Checker Black _ _) = False
-
+-}
 playMove :: Triangle -> Move -> Triangle
 playMove (Checker White position checkers) n = Checker White position (checkers - 1)
 
