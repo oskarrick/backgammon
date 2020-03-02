@@ -1,4 +1,4 @@
-import Rules
+import Regler
 
 type Position = Int
 type Move = Int
@@ -47,8 +47,40 @@ printGameState ((Checker Black position checkers):triangles) = do
   putStrLn $ "Black "++ show position ++ " " ++ show checkers
   printGameState triangles
 
-moveCheckers :: Board -> (a, a) -> IO Board
-moveCheckers [triangle] x = undefined
+{-
+moveCheckers :: Checkers -> Board -> [Int] -> IO Board
+moveCheckers checker board (x:xs) = do
+  move <- chooseChecker (checkerOptions checker board) chooseDice (x:xs)
+-}
+
+moveBlackChecker :: [Int] -> Board -> IO Board
+moveBlackChecker dices a@(x:xs) = do
+  checker <- chooseChecker a
+  dice <- chooseDice dices
+  
+
+
+  return expression
+
+moveChecker' a (pos + dice) (x:xs)
+
+moveChecker' :: Triangle -> Int -> Board -> Triangle
+moveChecker' a pos (x:xs) | not pos == position x = moveChecker' a pos xs
+                          | pos == position x = x
+                          | otherwise = x
+
+position :: Triangle -> Int
+position (Checker _ pos _) = pos
+position (Empty pos _) = pos
+
+chooseDice :: [Int] -> IO Int
+chooseDice x = do
+  putStrLn $ "Choose a dice " ++ show x
+  dice <- getLine
+  if read dice `elem` x
+    then return $ read dice
+    else chooseDice x
+
 
 {- checkerOptions
    Shows which checkers can, potentially, be moved
@@ -91,10 +123,10 @@ findTriangle (Checker Black _ _ :(triangles)) n = undefined
 validTriangle :: Board -> Triangle -> Move -> Maybe (Int)
 
 validTriangle (triangle:[]) (Checker White position checkers) n =
-  if validMove triangle && (position - n) == findPosition triangle then Just (position - n)
+  if Main.validMove triangle && (position - n) == findPosition triangle then Just (position - n)
   else Nothing
 validTriangle (triangle:triangles) (Checker White position checkers) n =
-  if validMove triangle && (position - n) == findPosition triangle then Just (position - n)
+  if Main.validMove triangle && (position - n) == findPosition triangle then Just (position - n)
   else validTriangle triangles (Checker White position checkers) n
 
 
