@@ -1,12 +1,23 @@
-module Dice
+module Dice 
 ( dice
 , twoDice
 , startGame
 , calculateMoves
+, chooseDice
+, menu
 ) where
 
 import System.Random
 import System.IO
+import Data.List
+import Backgammon
+
+type Position = Int
+type Move = Int
+type AmountCheckers = Int
+type Board = [Triangle]
+data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers deriving (Eq, Show)
+data Checkers = Black | White deriving (Show,Eq)
 
 
 
@@ -33,9 +44,11 @@ startGame = do
     putStrLn "Player 2, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number2)
-    if number1 > number2 then putStrLn ("Player 1 starts!")
-    else if number2 > number1 then putStrLn ("Player 2 starts!")
+    if number1 > number2 then putStrLn ("Player 1 starts as white!")
+    else if number2 > number1 then putStrLn ("Player 2 starts as black!")
     else startGame
+    if number1 > number2 then start White newGameState
+    else start Black newGameState
 
 calculateMoves = do
     number <- randomRIO (1,6) :: IO Int
@@ -45,15 +58,8 @@ calculateMoves = do
 
 
 chooseDice = do
-    dices <- calculateMoves
     putStrLn "Choose a dice"
     print dices
     dice <- readLn
-    if number == number2 then
-        putStrLn (show number ++ ", " ++ show number ++ ", " ++ show number2 ++ ", " ++ show number2)
-        else putStrLn (show number ++ ", " ++ show number2)
-    do
-        dice <- readLn
-        if (dice :: Int) == number then print number
-        else if (dice :: Int) == number2 then print number2
-        else putStrLn "Choose a dice that exists!"
+    if (dice :: Int) `elem` dices then return dice
+    else chooseDice
