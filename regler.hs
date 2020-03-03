@@ -5,11 +5,12 @@ module Regler
 type Position = Int
 type Move = Int
 type AmountCheckers = Int
+data Checkers = Black | White deriving (Show,Eq)
 data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers
   deriving (Eq, Show)
 type Board = [Triangle]
 
-data Checkers = Black | White deriving (Show,Eq)
+
 
 --type Board = (Int, [Checkers])
 
@@ -21,6 +22,7 @@ validMove (Checker White _ _) (Checker check pos amount) | White == check = True
 validMove (Checker Black _ _) (Checker check pos amount) | Black == check = True
                                                          | White == check && amount < 2 = True
                                                          | otherwise = False
+
 
 
 
