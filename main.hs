@@ -11,6 +11,7 @@ type Board = [Triangle]
 data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers deriving (Eq, Show)
 data Checkers = Black | White deriving (Show,Eq)
 
+main :: IO ()
 main = do
     putStrLn ("MENU")
     putStrLn ("1. Start game")
@@ -38,17 +39,17 @@ startGame = do
     else startGame
 
 start :: Board -> Checkers -> [Int] -> IO ()
-start board color moves = do 
+start board checkers moves = do 
     if moves == [] then do 
         newmoves <- calculateMoves
-        (if color == Black then start board White newmoves
+        (if checkers == Black then start board White newmoves
         else start board Black newmoves)
         else do
             printGameState board
             putStrLn ("")
-            putStrLn (show color ++ "'s turn") 
+            putStrLn (show checkers ++ "'s turn") 
             putStrLn ("Moves: " ++ show moves)
-            --moveChecker color moves gamestate
+            --moveChecker checkers moves board
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,
