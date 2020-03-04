@@ -37,12 +37,12 @@ startGame = do
 
 start color gamestate moves = do 
     if moves == [] then do 
+        printGameState gamestate
         moves <- calculateMoves
-        dice <- chooseDice moves
-        print dice
+        print moves
         else do 
-            dice <- chooseDice moves
-            print dice
+            printGameState gamestate
+            print moves
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,
@@ -70,3 +70,20 @@ chooseDice moves = do
     dice <- readLn
     if (dice :: Int) `elem` moves then return dice
     else chooseDice --}
+
+printGameState :: Board -> IO ()
+printGameState ((Empty position checkers):[]) = do
+  putStrLn $ "Empty " ++ show position ++ " " ++ show 0
+printGameState ((Empty position checkers):triangles) = do
+  putStrLn $ "Empty " ++ show position ++ " " ++ show 0
+  printGameState triangles
+printGameState ((Checker Black position checkers):[]) = do
+  putStrLn $ "Black "++ show position ++ " " ++ show checkers
+printGameState ((Checker White position checkers):[]) = do
+  putStrLn $ "White "++ show position ++ " " ++ show checkers
+printGameState ((Checker White position checkers):triangles) = do
+  putStrLn $ "White "++ show position ++ " " ++ show checkers
+  printGameState triangles
+printGameState ((Checker Black position checkers):triangles) = do
+  putStrLn $ "Black "++ show position ++ " " ++ show checkers
+  printGameState triangles
