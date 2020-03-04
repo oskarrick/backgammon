@@ -11,9 +11,6 @@ data Triangle = Empty Position AmountCheckers | Checker Checkers Position Amount
 type Board = [Triangle]
 
 
-
---type Board = (Int, [Checkers])
-
 validMove :: Triangle -> Triangle -> Bool
 validMove _ (Empty _ _) = True
 validMove (Checker White _ _) (Checker check pos amount) | White == check = True
