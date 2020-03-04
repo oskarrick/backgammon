@@ -23,30 +23,31 @@ main = do
 startGame :: IO ()
 startGame = do
     number1 <- randomRIO (1,6) :: IO Int
-    putStrLn "Player 1, enter any button to roll the dice"
+    putStrLn "White, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number1)
     number2 <- randomRIO (1,6) :: IO Int
-    putStrLn "Player 2, enter any button to roll the dice"
+    putStrLn "Black, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number2)
     moves <- calculateMoves
-    if number1 > number2 then putStrLn ("Player 1 starts as white!")
-    else if number2 > number1 then putStrLn ("Player 2 starts as black!")
+    if number1 > number2 then 
+        start White newGameState moves
+    else if number2 > number1 then 
+        start Black newGameState moves
     else startGame
-    if number1 > number2 then start White newGameState moves
-    else start Black newGameState moves
 
-start color gamestate moves = do
-    if moves == [] then do
-        printGameState gamestate
-        moves <- calculateMoves
-        print moves
-        moveChecker color moves gamestate
-        else do 
+start color gamestate moves = do 
+    if moves == [] then do 
+        newmoves <- calculateMoves
+        (if color == Black then start White gamestate newmoves
+        else start Black gamestate newmoves)
+        else do
             printGameState gamestate
-            print moves
-            moveChecker color moves gamestate
+            putStrLn ("")
+            putStrLn (show color ++ "'s turn") 
+            putStrLn ("Moves: " ++ show moves)
+            --moveChecker color moves gamestate
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,

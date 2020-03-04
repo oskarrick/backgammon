@@ -23,8 +23,6 @@ data Checkers = Black | White deriving (Show,Eq)
 data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers
   deriving (Eq, Show)
 type Board = [Triangle]
---data State = Running | GameOver (Maybe Player) deriving (Eq, Show)
-
 
 --main2 :: IO ()
 main2 :: Checkers -> [Int] -> Board -> IO Board
