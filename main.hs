@@ -35,11 +35,6 @@ startGame = do
     if number1 > number2 then start White newGameState moves
     else start Black newGameState moves
 
-{--start color gamestate = do 
-    moves <- calculateMoves
-    dice <- chooseDice moves
-    print dice--}
-
 start color gamestate moves = do 
     if moves == [] then do 
         moves <- calculateMoves
@@ -56,8 +51,6 @@ newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checke
                 Checker Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,Checker White 24 2]
 
 calculateMoves = do 
-    putStrLn "Enter any button to roll the dice!"
-    _ <- getLine
     number <- randomRIO (1,6) :: IO Int
     number2 <- randomRIO (1,6) :: IO Int
     if number == number2 then return [number, number, number2, number2]
