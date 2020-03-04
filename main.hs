@@ -1,3 +1,5 @@
+
+
 import System.Random
 import System.IO
 import Data.List
@@ -19,9 +21,9 @@ main = do
     else main
 
 startGame :: IO ()
-startGame = do 
+startGame = do
     number1 <- randomRIO (1,6) :: IO Int
-    putStrLn "Player 1, enter any button to roll the dice" 
+    putStrLn "Player 1, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number1)
     number2 <- randomRIO (1,6) :: IO Int
@@ -35,8 +37,8 @@ startGame = do
     if number1 > number2 then start White newGameState moves
     else start Black newGameState moves
 
-start color gamestate moves = do 
-    if moves == [] then do 
+start color gamestate moves = do
+    if moves == [] then do
         printGameState gamestate
         moves <- calculateMoves
         print moves
@@ -52,7 +54,7 @@ newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checke
                 Checker Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Checker Black 17 3,Empty 18 0,
                 Checker Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,Checker White 24 2]
 
-calculateMoves = do 
+calculateMoves = do
     number <- randomRIO (1,6) :: IO Int
     number2 <- randomRIO (1,6) :: IO Int
     if number == number2 then return [number, number, number2, number2]
@@ -67,7 +69,7 @@ chooseDice moves = do
     else chooseDice moves
 
 {--chooseDice moves = do
-    putStrLn "Choose a dice" 
+    putStrLn "Choose a dice"
     print moves
     dice <- readLn
     if (dice :: Int) `elem` moves then return dice
