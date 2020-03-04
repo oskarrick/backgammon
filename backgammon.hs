@@ -175,8 +175,9 @@ deleteDie die (x:xs) = if die == x then xs else x:deleteDie die xs
 insertWhite :: Triangle -> Board -> Int -> Board
 insertWhite tri [] acc = []
 insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == (position x) && isCheckerWhite x = ((Checker White (position x) (amount+2)):insertWhite tri xs (acc))
+                                                        | acc == (position x) && isCheckerBlack x = ((Checker White (position x) 1):insertWhite tri xs acc) ++ [(Checker Black 0 1)]
                                                         | acc == (position x) = ((Checker White (position x) 1):insertWhite tri xs (acc))
-                                                        | tri == x && amount < 2 && isCheckerBlack = (Empty (position tri) 0):xs
+                                                        | tri == x && amount < 2 = (Empty (position tri) 0):xs
                                                         | tri == x = (Checker checker pos (amount-1)):xs
                                                         | otherwise = x:insertWhite tri xs acc
 
@@ -184,6 +185,7 @@ insertBlack :: Triangle -> Board -> Int -> Board
 insertBlack tri [] acc = []
 insertBlack tri ((Empty pos _):xs) 1 = (Checker Black pos 1):xs
 insertBlack tri ((Checker checker2 pos amount):xs) 1 | Black == checker2 = (Checker Black pos (amount+1)):xs
+                                                     | White == checker2 = (Checker Black pos 1):xs ++ [(Checker White 25 1)]
                                                      | otherwise = (Checker Black pos 1):xs
 insertBlack tri@(Checker checker2 pos amount) (x:xs) acc | tri == x && amount < 2 = (Empty pos 0):(insertBlack tri xs (acc-1))
                                                          | tri == x = (Checker checker2 pos (amount-1)):(insertBlack tri xs (acc-1))
