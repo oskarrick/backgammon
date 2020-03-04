@@ -28,16 +28,26 @@ startGame = do
     putStrLn "Player 2, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number2)
+    moves <- calculateMoves
     if number1 > number2 then putStrLn ("Player 1 starts as white!")
     else if number2 > number1 then putStrLn ("Player 2 starts as black!")
     else startGame
-    if number1 > number2 then start White newGameState
-    else start Black newGameState 
+    if number1 > number2 then start White newGameState moves
+    else start Black newGameState moves
 
-start color gamestate = do 
+{--start color gamestate = do 
     moves <- calculateMoves
     dice <- chooseDice moves
-    print dice
+    print dice--}
+
+start color gamestate moves = do 
+    if moves == [] then do 
+        moves <- calculateMoves
+        dice <- chooseDice moves
+        print dice
+        else do 
+            dice <- chooseDice moves
+            print dice
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,
