@@ -40,9 +40,11 @@ start color gamestate moves = do
         printGameState gamestate
         moves <- calculateMoves
         print moves
+        moveChecker color moves gamestate
         else do 
             printGameState gamestate
             print moves
+            moveChecker color moves gamestate
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,
