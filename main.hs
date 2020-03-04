@@ -32,18 +32,19 @@ startGame = do
     putStrLn (show number2)
     moves <- calculateMoves
     if number1 > number2 then 
-        start White newGameState moves
+        start newGameState White moves
     else if number2 > number1 then 
-        start Black newGameState moves
+        start newGameState Black moves
     else startGame
 
-start color gamestate moves = do 
+start :: Board -> Checkers -> [Int] -> IO ()
+start board color moves = do 
     if moves == [] then do 
         newmoves <- calculateMoves
-        (if color == Black then start White gamestate newmoves
-        else start Black gamestate newmoves)
+        (if color == Black then start board White newmoves
+        else start board Black newmoves)
         else do
-            printGameState gamestate
+            printGameState board
             putStrLn ("")
             putStrLn (show color ++ "'s turn") 
             putStrLn ("Moves: " ++ show moves)
@@ -92,3 +93,37 @@ printGameState ((Checker White position checkers):triangles) = do
 printGameState ((Checker Black position checkers):triangles) = do
   putStrLn $ "Black "++ show position ++ " " ++ show checkers
   printGameState triangles
+
+isCheckerWhite :: Triangle -> Bool
+isCheckerWhite (Checker White _ _) = True
+isCheckerWhite _ = False
+
+isCheckerBlack :: Triangle -> Bool
+isCheckerBlack (Checker Black _ _) = True
+isCheckerBlack _ = False
+
+amountTri :: Triangle -> Int
+amountTri (Empty _ amount) = amount
+amountTri (Checker _ _ amount) = amount
+
+checkerOptions :: Checkers -> Board -> Board
+checkerOptions _ [] = []
+checkerOptions a@White (x:xs) = if isCheckerWhite x
+                                then x :(checkerOptions a xs)
+                                else checkerOptions a xs
+checkerOptions a@Black (x:xs) = if isCheckerBlack x
+                                then x :(checkerOptions a xs)
+                                else checkerOptions a xs
+
+amountOfCheckers :: Board -> Checkers -> Int
+amountOfCheckers (x:xs) checker = amountOfCheckers' $ checkerOptions checker (x:xs)
+                                    where
+                                      amountOfCheckers' (x:[]) = amountTri x
+                                      amountOfCheckers' (x:xs) = amountOfCheckers' xs + amountTri x
+
+winCheck :: Board -> Checkers -> [Int] -> IO ()
+winCheck board checkers moves = if amountOfCheckers board White == 0 
+    then  putStrLn ("White wins!")
+    else if amountOfCheckers board Black == 0 
+        then putStrLn ("Black wins!")
+        else start board checkers moves
