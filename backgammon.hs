@@ -106,30 +106,69 @@ homeBoard checker (x:xs) = if checker == Black
                               homeBoardBlack (x:xs) = if position x < 19 then False else True
                               homeBoardWhite (x:xs) = if position x > 6 then False else True
 
+--canUseDie :: Checkers -> Int -> Triangle -> [Int] -> [Int]
+canUseDice :: Checkers -> Board -> Int -> [Int] -> [Int]
+canUseDice checker board die dice = if homeBoard checker board
+                                    then dice
+                                    else if checker == Black
+                                      then canUseDiceBlack (checkerOptions checker board) die dice
+                                      else canUseDiceWhite (reverse (checkerOptions checker board)) die dice
+
+canUseDiceBlack :: Board -> Int -> [Int] -> [Int]
+canUseDiceBlack [] _ dice = dice
+canUseDiceBlack (x:xs) die dice = if (position x+die) > 24
+                                    then (deleteDie die dice)
+                                    else canUseDiceBlack xs die dice
+
+canUseDiceWhite :: Board -> Int -> [Int] -> [Int]
+canUseDiceWhite [] _ dice = dice
+canUseDiceWhite (x:xs) die dice = if (position x-die) < 1
+                                    then (deleteDie die dice)
+                                    else dice
+
+possibleMoves :: Checkers -> [Int] -> Triangle -> Board -> Board
+possibleMoves checker [] tri board = []
+possibleMoves checker dice@(x:xs) tri board = if checker == Black
+                                                then (if position tri + x > 24
+                                                        then possibleMoves checker xs tri board
+                                                        else (if validMove tri (newCheckerPos2 (position tri+x) board)
+                                                                then newCheckerPos2 (position tri+x) board:possibleMoves checker xs tri board
+                                                                else possibleMoves checker xs tri board))
+                                                else (if position tri-x < 1
+                                                        then possibleMoves checker xs tri board
+                                                        else (if validMove tri (newCheckerPos2 (position tri-x) board)
+                                                        then (newCheckerPos2 (position tri-x) board):possibleMoves checker xs tri board
+                                                        else possibleMoves checker xs tri board))
 
 moveChecker :: Checkers -> [Int] -> Board -> IO Board
 moveChecker checker dice a@(x:xs) = do
   tri <- chooseChecker (checkerOptions checker (x:xs))
   die <- chooseDice dice
-  if checker == Black if homeBoard checker a &&
-
-
-    {-checker == Black
-              then (if homeBoard Black a
-                      then homeCheckerPos (po)
-                      else newCheckerPos (position tri+die) a)
-              else (if homeBoard White a
-                      then
-                      else newCheckerPos (position tri-die) a
-                      -}
-  newPos <- if checker == Black
-              then newCheckerPos (position tri+die) a
-              else newCheckerPos (position tri-die) a
-  if validMove tri newPos
-    then if checker == Black
-      then main2 Black (deleteDie die dice) (insertBlack tri a (position tri+die))
-      else main2 White (deleteDie die dice) (insertWhite tri a (position tri-die))
-    else moveChecker checker dice a
+  --moves <-
+  if checker == Black
+    then (if (position tri+die > 24 && not (homeBoard Black a))
+      then moveChecker checker dice a
+      else (do
+         newPos <- newCheckerPos (position tri+die) a
+         if validMove tri newPos
+           then if checker == Black
+             then main2 Black (deleteDie die dice) (insertBlack tri a (position tri+die))
+             else main2 White (deleteDie die dice) (insertWhite tri a (position tri-die))
+           else moveChecker checker dice a))
+    else (if (position tri-die < 1 && not (homeBoard White a ))
+      then moveChecker checker dice a
+      else (do
+        newPos <- newCheckerPos (position tri-die) a
+        if validMove tri newPos
+          then if checker == Black
+            then main2 Black (deleteDie die dice) (insertBlack tri a (position tri+die))
+            else main2 White (deleteDie die dice) (insertWhite tri a (position tri-die))
+          else moveChecker checker dice a))
+  --if validMove tri newPos
+    --then if checker == Black
+      --then main2 Black (deleteDie die dice) (insertBlack tri a (position tri+die))
+      --else main2 White (deleteDie die dice) (insertWhite tri a (position tri-die))
+    --else moveChecker checker dice a
 
 
 deleteDie :: Int -> [Int] -> [Int]
@@ -139,7 +178,7 @@ insertWhite :: Triangle -> Board -> Int -> Board
 insertWhite tri [] acc = []
 insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == (position x) && isCheckerWhite x = ((Checker White (position x) (amount+2)):insertWhite tri xs (acc))
                                                         | acc == (position x) = ((Checker White (position x) 1):insertWhite tri xs (acc))
-                                                        | tri == x && amount < 2 = (Empty (position tri) 0):xs
+                                                        | tri == x && amount < 2 && isCheckerBlack = (Empty (position tri) 0):xs
                                                         | tri == x = (Checker checker pos (amount-1)):xs
                                                         | otherwise = x:insertWhite tri xs acc
 
@@ -169,6 +208,11 @@ newCheckerPos pos (x:xs) = do
   if not (pos == position x)
     then newCheckerPos pos xs
     else return (x)
+
+newCheckerPos2 :: Int -> Board -> Triangle
+newCheckerPos2 pos (x:xs) = if not (pos == position x)
+                              then newCheckerPos2 pos xs
+                              else x
 
 --homeCheckerPos :: IO Triangle
 --homeCheckerPos
