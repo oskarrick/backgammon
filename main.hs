@@ -30,16 +30,21 @@ startGame = do
     putStrLn "Player 2, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number2)
+    moves <- calculateMoves
     if number1 > number2 then putStrLn ("Player 1 starts as white!")
     else if number2 > number1 then putStrLn ("Player 2 starts as black!")
     else startGame
-    if number1 > number2 then start White newGameState
-    else start Black newGameState
+    if number1 > number2 then start White newGameState moves
+    else start Black newGameState moves
 
-start color gamestate = do
-    moves <- calculateMoves
-    print moves
-    chooseDice moves
+start color gamestate moves = do
+    if moves == [] then do
+        printGameState gamestate
+        moves <- calculateMoves
+        print moves
+        else do
+            printGameState gamestate
+            print moves
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,
@@ -48,16 +53,39 @@ newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checke
                 Checker Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,Checker White 24 2]
 
 calculateMoves = do
-    putStrLn "Enter any button to roll the dice!"
-    _ <- getLine
     number <- randomRIO (1,6) :: IO Int
     number2 <- randomRIO (1,6) :: IO Int
     if number == number2 then return [number, number, number2, number2]
         else return [number,number2]
 
+chooseDice :: [Int] -> IO Int
 chooseDice moves = do
+  putStrLn $ "Choose a dice \n"++show moves
+  dice <- getLine
+  if read dice `elem` moves
+    then return (read dice)
+    else chooseDice moves
+
+{--chooseDice moves = do
     putStrLn "Choose a dice"
     print moves
     dice <- readLn
     if (dice :: Int) `elem` moves then return dice
-    else chooseDice
+    else chooseDice --}
+
+printGameState :: Board -> IO ()
+printGameState ((Empty position checkers):[]) = do
+  putStrLn $ "Empty " ++ show position ++ " " ++ show 0
+printGameState ((Empty position checkers):triangles) = do
+  putStrLn $ "Empty " ++ show position ++ " " ++ show 0
+  printGameState triangles
+printGameState ((Checker Black position checkers):[]) = do
+  putStrLn $ "Black "++ show position ++ " " ++ show checkers
+printGameState ((Checker White position checkers):[]) = do
+  putStrLn $ "White "++ show position ++ " " ++ show checkers
+printGameState ((Checker White position checkers):triangles) = do
+  putStrLn $ "White "++ show position ++ " " ++ show checkers
+  printGameState triangles
+printGameState ((Checker Black position checkers):triangles) = do
+  putStrLn $ "Black "++ show position ++ " " ++ show checkers
+  printGameState triangles
