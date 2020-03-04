@@ -23,28 +23,32 @@ main = do
 startGame :: IO ()
 startGame = do
     number1 <- randomRIO (1,6) :: IO Int
-    putStrLn "Player 1, enter any button to roll the dice"
+    putStrLn "White, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number1)
     number2 <- randomRIO (1,6) :: IO Int
-    putStrLn "Player 2, enter any button to roll the dice"
+    putStrLn "Black, enter any button to roll the dice"
     _ <- getLine
     putStrLn (show number2)
     moves <- calculateMoves
-    if number1 > number2 then putStrLn ("Player 1 starts as white!")
-    else if number2 > number1 then putStrLn ("Player 2 starts as black!")
+    if number1 > number2 then 
+        start newGameState White moves
+    else if number2 > number1 then 
+        start newGameState Black moves
     else startGame
-    if number1 > number2 then start White newGameState moves
-    else start Black newGameState moves
 
-start color gamestate moves = do
-    if moves == [] then do
-        printGameState gamestate
-        moves <- calculateMoves
-        print moves
+start :: Board -> Checkers -> [Int] -> IO ()
+start board color moves = do 
+    if moves == [] then do 
+        newmoves <- calculateMoves
+        (if color == Black then start board White newmoves
+        else start board Black newmoves)
         else do
-            printGameState gamestate
-            print moves
+            printGameState board
+            putStrLn ("")
+            putStrLn (show color ++ "'s turn") 
+            putStrLn ("Moves: " ++ show moves)
+            --moveChecker color moves gamestate
 
 newGameState :: Board
 newGameState = [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,
@@ -89,3 +93,37 @@ printGameState ((Checker White position checkers):triangles) = do
 printGameState ((Checker Black position checkers):triangles) = do
   putStrLn $ "Black "++ show position ++ " " ++ show checkers
   printGameState triangles
+
+isCheckerWhite :: Triangle -> Bool
+isCheckerWhite (Checker White _ _) = True
+isCheckerWhite _ = False
+
+isCheckerBlack :: Triangle -> Bool
+isCheckerBlack (Checker Black _ _) = True
+isCheckerBlack _ = False
+
+amountTri :: Triangle -> Int
+amountTri (Empty _ amount) = amount
+amountTri (Checker _ _ amount) = amount
+
+checkerOptions :: Checkers -> Board -> Board
+checkerOptions _ [] = []
+checkerOptions a@White (x:xs) = if isCheckerWhite x
+                                then x :(checkerOptions a xs)
+                                else checkerOptions a xs
+checkerOptions a@Black (x:xs) = if isCheckerBlack x
+                                then x :(checkerOptions a xs)
+                                else checkerOptions a xs
+
+amountOfCheckers :: Board -> Checkers -> Int
+amountOfCheckers (x:xs) checker = amountOfCheckers' $ checkerOptions checker (x:xs)
+                                    where
+                                      amountOfCheckers' (x:[]) = amountTri x
+                                      amountOfCheckers' (x:xs) = amountOfCheckers' xs + amountTri x
+
+winCheck :: Board -> Checkers -> [Int] -> IO ()
+winCheck board checkers moves = if amountOfCheckers board White == 0 
+    then  putStrLn ("White wins!")
+    else if amountOfCheckers board Black == 0 
+        then putStrLn ("Black wins!")
+        else start board checkers moves
