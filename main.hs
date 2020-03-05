@@ -244,7 +244,7 @@ position (Empty pos _) = pos
 
 {-
 checkerOptions checkers board
-
+Checke
 PRE:  ... precondition on the arguments, if any ...
 RETURNS: ... description of the result, in terms of the arguments ...
 SIDE EFFECTS: ... side effects, if any, including exceptions ...
@@ -416,7 +416,7 @@ moveChecker checker dice a@(x:xs) = do
           then start Black (deleteDie die dice) (insertBlack tri a (position tri+die))
           else start White (deleteDie die dice) (insertWhite tri a newPos)
         else do
-          putStrLn $ "Invalid move"
+          putStrLn $ "INVALID MOVE"
           moveChecker checker dice a
     else do
   tri <- chooseChecker (validMoves checker dice a)
@@ -431,20 +431,20 @@ moveChecker checker dice a@(x:xs) = do
                     if validMove tri newPos
                     then start Black (deleteDie die dice) (insertBlack tri a (position tri+die))
                     else do
-                      putStrLn $ "Invalid move"
+                      putStrLn $ "INVALID MOVE"
                       moveChecker checker dice a) ) )
     else (if homeBoard White a && (position tri-die) < 1
           then start checker (deleteDie die dice) (bearOff tri a)
           else (if (position tri-die < 1)
                   then do
-                    putStrLn $ "Invalid move"
+                    putStrLn $ "INVALID MOVE"
                     moveChecker checker dice a
                   else (do
                     newPos <- newCheckerPos (position tri-die) a
                     if validMove tri newPos
                     then start White (deleteDie die dice) (insertWhite tri a newPos)
                     else do
-                      putStrLn $ "Invalid move"
+                      putStrLn $ "INVALID MOVE"
                       moveChecker checker dice a)))
   --if validMove tri newPos
     --then if checker == Black
