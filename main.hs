@@ -4,11 +4,55 @@ import System.Random
 import System.IO
 import Data.List
 
+{-
+... description of what the data type represents ... 
+... description of how the datatype represents data ...
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
+
+{-
+Represents the position on the board
+The position is an Int
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
 type Position = Int
+
+{-
+Represents a move 
+The move is an Int
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
 type Move = Int
+
+{-
+Represents the amount of checkers
+The amount is an Int
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
 type AmountCheckers = Int
+
+{-
+Represents a Backgammon board
+The Backgammon board is made up of a list of triangles
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
 type Board = [Triangle]
+
+{-
+Represents a triangle on a Backgammon board
+The first value constructor determines whether the triangle is empty or not
+If the triangle is not empty the value constructor after that is Checkers which is the color of the checkers in the triangle
+After that is Position which declares the triangle's position on the board
+Lastly is the amount of checkers in the traingle with AmountCheckers
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
 data Triangle = Empty Position AmountCheckers | Checker Checkers Position AmountCheckers deriving (Eq, Show)
+
+{-
+Represents the color of the checkers
+Color is either black or white
+INVARIANT:  ... a predicate on elements of the datatype that the code preserves at all times ...
+-}
 data Checkers = Black | White deriving (Show,Eq)
 
 {-
