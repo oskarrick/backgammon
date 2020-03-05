@@ -244,7 +244,7 @@ position (Empty pos _) = pos
 
 {-
 checkerOptions checkers board
-Checke
+Checks which checkers (for aare on the board and where they are
 PRE:  ... precondition on the arguments, if any ...
 RETURNS: ... description of the result, in terms of the arguments ...
 SIDE EFFECTS: ... side effects, if any, including exceptions ...
@@ -287,7 +287,7 @@ amountOfCheckers :: Board -> Checkers -> Int
 amountOfCheckers (x:xs) checker = amountOfCheckers' $ checkerOptions checker (x:xs)
                                     where
                                       amountOfCheckers' [] = 0
-                                      amountOfCheckers' (x:[]) = amountTri x
+                                    --  amountOfCheckers' (x:[]) = amountTri x
                                       amountOfCheckers' (x:xs) = amountOfCheckers' xs + amountTri x
 
 {-
@@ -371,14 +371,14 @@ validMovesOffBoard checker board dice = if checker == Black
                                           else validMovesOffBoardWhite (offTheBoard checker board) dice board dice
 
 validMovesOffBoardWhite :: Board -> [Int] -> Board -> [Int] -> Board
-validMovesOffBoardWhite [] _ _ _ = []
-validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesOffBoardWhite xs acc board acc
-                                                    | otherwise = validMovesOffBoardWhite xs dice board acc
+validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x
+                                                    | validMove x (newCheckerPos2 (position x-(head dice)) board) = x
+                                                    | otherwise = []
 
 validMovesOffBoardBlack :: Board -> [Int] -> Board -> [Int] -> Board
-validMovesOffBoardBlack [] _ _ _ = []
-validMovesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x+die) board) = x:validMovesOffBoardBlack xs acc board acc
-                                                    | otherwise = validMovesOffBoardBlack xs dice board acc
+validMovesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x+die) board) = x:[]
+                                                    | validMove x (newCheckerPos2 (position x+(head dice))board) = x:[]
+                                                    | otherwise = []
 
 moveChecker :: Checkers -> [Int] -> Board -> IO ()
 moveChecker checker dice a@(x:xs) = do
