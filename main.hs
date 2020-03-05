@@ -276,6 +276,9 @@ chooseChecker chkrs = do
       then chooseChecker chkrs
       else return $ chosenChecker chkrs (read checker)
 
+{- chosenChecker
+   help function to chooseChecker
+-}
 chosenChecker :: Board -> Int -> Triangle
 chosenChecker (x:xs) 1 = x
 chosenChecker (x:xs) n = chosenChecker xs (n-1)
@@ -283,24 +286,19 @@ chosenChecker (x:xs) n = chosenChecker xs (n-1)
 {-
 amountOfCheckers board checkers
 Counts the total amount of checkers on the board
-PRE:
 RETURNS: An Int representing the amount of checkers on the board
-SIDE EFFECTS:
 EXAMPLES:
 -}
 amountOfCheckers :: Board -> Checkers -> Int
 amountOfCheckers (x:xs) checker = amountOfCheckers' $ checkerOptions checker (x:xs)
                                     where
                                       amountOfCheckers' [] = 0
-                                    --  amountOfCheckers' (x:[]) = amountTri x
                                       amountOfCheckers' (x:xs) = amountOfCheckers' xs + amountTri x
 
 {-
 winCheck board checkers [Int]
 Checks if either player has won the game
-PRE:
-RETURNS:
-SIDE EFFECTS:
+RETURNS: True if amountOfCheckers board checkers is 0, False otherwise
 EXAMPLES:
 -}
 winCheck :: Board -> Checkers -> Bool
@@ -322,6 +320,10 @@ homeBoard checker (x:xs) = if checker == Black
                               homeBoardWhite (x:xs) = if position x > 6 then False else True
 
 
+{- offTheBoard checker board
+   checks if any checker is outside the board
+   RETURNS: a list of any checkers (of color checker) outside the board
+-}
 offTheBoard :: Checkers -> Board -> Board
 offTheBoard checker board = if checker == Black then offTheBoardBlack board else offTheBoardWhite board
 
@@ -335,6 +337,10 @@ offTheBoardBlack [] = []
 offTheBoardBlack (x:xs) | x == (Checker Black 0 1) = (Checker Black 0 1):offTheBoardBlack xs
                         | otherwise = offTheBoardBlack xs
 
+{- validMoves checker dice board
+   Looks up which checker-moves are valid
+   RETURN: a list of valid checker-moves
+-}
 validMoves :: Checkers -> [Int] -> Board -> Board
 validMoves checker dice board = if homeBoard checker board
                                   then checkerOptions checker board
@@ -342,6 +348,7 @@ validMoves checker dice board = if homeBoard checker board
                                   then validMovesWhite (checkerOptions White board) dice board dice
                                   else validMovesBlack (checkerOptions Black board) dice board dice)
 
+-- helper function to validMoves
 validMovesBlack :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesBlack [] _ _ _ = []
 validMovesBlack (x:xs) [] board acc = validMovesBlack xs acc board acc
@@ -349,6 +356,7 @@ validMovesBlack (x:xs) a@(die:dice) board acc | (position x+die) > 24 = validMov
                                               | (validMove x (newCheckerPos2 (position x+die) board)) = (x:(validMovesBlack xs acc board acc))
                                               | otherwise = validMovesBlack (x:xs) dice board acc
 
+-- helper function to validMoves
 validMovesWhite :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesWhite [] _ _ _ = []
 validMovesWhite (x:xs) [] board acc = validMovesWhite xs acc board acc
@@ -356,11 +364,18 @@ validMovesWhite (x:xs) (die:dice) board acc | (position x-die) < 1 = validMovesW
                                             | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesWhite (xs) acc board acc
                                             | otherwise = validMovesWhite (x:xs) dice board acc
 
+{- validMovesOffBoard checker board dice
+   Checks if any checkers outside the board can reenter it
+   RETURNS: a Board with one or zero Triangles, one Triangle if the Triangle outside the board
+   can reenter it, and zero if it cannot
+
+-}
 validMovesOffBoard :: Checkers -> Board -> [Int] -> Board
 validMovesOffBoard checker board dice = if checker == Black
                                           then validMovesOffBoardBlack (offTheBoard checker board) dice board dice
                                           else validMovesOffBoardWhite (offTheBoard checker board) dice board dice
 
+-- helper function to validMovesOffBoard
 validMovesOffBoardWhite :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesOffBoardWhite (x:xs) (die:[]) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:[]
                                                   | otherwise = []
@@ -368,6 +383,7 @@ validMovesOffBoardWhite (x:xs) (die:dice:dicee) board acc | validMove x (newChec
                                                     | validMove x (newCheckerPos2 (position x-dice) board) = x:[]
                                                     | otherwise = []
 
+-- helper function to validMovesOffBoard
 validMovesOffBoardBlack :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesOffBoardBlack (x:xs) (die:[]) board acc | validMove x (newCheckerPos2 (position x+die) board) = x:[]
                                                   | otherwise = []
@@ -375,6 +391,11 @@ validMovesOffBoardBlack (x:xs) (die:dice:dicee) board acc | validMove x (newChec
                                                     | validMove x (newCheckerPos2 (position x+dice) board) = x:[]
                                                     | otherwise = []
 
+
+{- moveChecker checker dice board
+   moves the checkers around the board with input from the players
+   SIDE EFFECTS: prints Strings and accepts inputs
+-}
 moveChecker :: Checkers -> [Int] -> Board -> IO ()
 moveChecker checker dice a@(x:xs) = do
   if dice == [] || (validMoves checker dice a) == [] || (not (offTheBoard checker a==[]) && (validMovesOffBoard checker a dice == []) )
@@ -425,6 +446,9 @@ moveChecker checker dice a@(x:xs) = do
                       moveChecker checker dice a)))
 
 
+{- bearOff
+
+-}
 bearOff :: Triangle -> Board -> Board
 bearOff tri [] = []
 bearOff tri@(Checker checker pos amount) (x:xs) | tri == x && amount < 2 = (Empty pos 0):bearOff tri xs
@@ -487,7 +511,8 @@ test1 = TestCase $ assertEqual "ValidMove (Checker White 1 2) (Empty 3 0)" True 
 
 test2 = TestCase $ assertEqual "insertBlack" [Checker Black 1 1,Empty 2 0,Checker Black 3 1,Empty 4 0,Empty 5 0,Checker White 6 5,Empty 7 0,Checker White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,Checker White 12 5,Checker Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Checker Black 17 3,Empty 18 0,Checker Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,Checker White 24 2] (insertBlack (Checker Black 1 2) newGameState 3)
 
---test3 = TestCase $ assertEqual "insertWhite" 
+test3 = TestCase $ assertEqual "insertWhite" [Checker Black 1 2,Empty 2 0,Empty 3 0,Empty 4 0,Empty 5 0,Checker White 6 5,Empty 7 0,Checker White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,Checker White 12 5,Checker Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Checker Black 17 3,Empty 18 0,Checker Black 19 5,Empty 20 0,Empty 21 0,Checker White 22 1,Empty 23 0,Checker White 24 1] (insertWhite (Checker White 24 2) newGameState (Empty 22 0))
+
 
 -- for running all the tests
-runtests = runTestTT $ TestList [test1, test2]
+runtests = runTestTT $ TestList [test1, test2,test3]
