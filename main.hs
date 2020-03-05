@@ -115,8 +115,12 @@ start :: Checkers -> [Int] -> Board -> IO ()
 start checkers moves board = do
   if winCheck board checkers
     then if checkers == Black
-          then putStrLn $ "Player 2 wins!"
-          else putStrLn $ "Player 1 wins!"
+          then do 
+            putStrLn ("Black wins!") 
+            main
+          else do 
+            putStrLn ("White wins!") 
+            main
     else do
     if moves == [] then do
         newmoves <- calculateMoves
@@ -297,9 +301,9 @@ winCheck board checkers = if amountOfCheckers board White == 0
         then True
         else False
 
-        {-
-            check if all checkers are in their homeboard
-        -}
+{-
+check if all checkers are in their homeboard
+-}
 homeBoard :: Checkers -> Board -> Bool
 homeBoard checker (x:xs) = if checker == Black
                             then homeBoardBlack $ checkerOptions checker (x:xs)
