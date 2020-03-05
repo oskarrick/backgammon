@@ -261,9 +261,9 @@ checkerOptions a@Black (x:xs) = if isCheckerBlack x
 
 chooseChecker :: Board -> IO Triangle
 chooseChecker chkrs = do
-  putStrLn ("Possible moves:")
-  putStrLn $ "Choose a checker (1-" ++ show (length chkrs) ++")"
+  putStrLn ("Moveable checkers:")
   printGameState chkrs
+  putStrLn $ "\nChoose a checker (1-" ++ show (length chkrs) ++")"
   checker <- getLine
   if checker == ""
     then chooseChecker chkrs
