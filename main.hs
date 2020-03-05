@@ -172,9 +172,12 @@ chooseDice :: [Int] -> IO Int
 chooseDice moves = do
   putStrLn $ "Choose a dice \n"++show moves
   dice <- getLine
-  if read dice `elem` moves
-    then return (read dice)
-    else chooseDice moves
+  if dice == ""
+    then chooseDice moves
+    else if read dice `elem` moves
+      then return (read dice)
+      else chooseDice moves
+
 
 {-
 printGameState board
@@ -259,11 +262,13 @@ checkerOptions a@Black (x:xs) = if isCheckerBlack x
 chooseChecker :: Board -> IO Triangle
 chooseChecker chkrs = do
   putStrLn $ "Choose a checker (1-" ++ show (length chkrs) ++")"
-  print chkrs
+  printGameState chkrs
   checker <- getLine
-  if read checker > length chkrs || read checker < 1
+  if checker == ""
     then chooseChecker chkrs
-    else return $ chosenChecker chkrs (read checker)
+    else if read checker > length chkrs || read checker < 1
+      then chooseChecker chkrs
+      else return $ chosenChecker chkrs (read checker)
 
 chosenChecker :: Board -> Int -> Triangle
 chosenChecker (x:xs) 1 = x
