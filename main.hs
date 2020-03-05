@@ -286,6 +286,7 @@ EXAMPLES:
 amountOfCheckers :: Board -> Checkers -> Int
 amountOfCheckers (x:xs) checker = amountOfCheckers' $ checkerOptions checker (x:xs)
                                     where
+                                      amountOfCheckers' [] = []
                                       amountOfCheckers' (x:[]) = amountTri x
                                       amountOfCheckers' (x:xs) = amountOfCheckers' xs + amountTri x
 
@@ -371,13 +372,14 @@ validMovesOffBoard checker board dice = if checker == Black
 
 validMovesOffBoardWhite :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesOffBoardWhite [] _ _ _ = []
-validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesOffBoardWhite xs dice board acc
+validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesOffBoardWhite xs acc board acc
                                                     | otherwise = validMovesOffBoardWhite xs dice board acc
 
 validMovesOffBoardBlack :: Board -> [Int] -> Board -> [Int] -> Board
-validMovesOffBoardBlack [] _ _ _ = []
-validMOvesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x+die) board) = x:validMovesOffBoardBlack xs dice board acc
-                                                    | otherwise = validMovesOffBoardBlack xs dice board acc
+--validMovesOffBoardBlack [] _ _ _ = []
+validMovesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x+die) board) = x
+                                                    | validMove x (newCheckerPos2 (position x+(head dice))) = x
+                                                    | otherwise = []
 
 moveChecker :: Checkers -> [Int] -> Board -> IO ()
 moveChecker checker dice a@(x:xs) = do
