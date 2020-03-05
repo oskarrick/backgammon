@@ -170,7 +170,7 @@ EXAMPLES:
 -}
 chooseDice :: [Int] -> IO Int
 chooseDice moves = do
-  putStrLn $ "Choose a die \n"++show moves
+  putStrLn $ "Choose a die "++show moves
   dice <- getLine
   if dice == ""
     then chooseDice moves
@@ -462,6 +462,7 @@ bearOff tri@(Checker checker pos amount) (x:xs) | tri == x && amount < 2 = (Empt
 deleteDie :: Int -> [Int] -> [Int]
 deleteDie die (x:xs) = if die == x then xs else x:deleteDie die xs
     --acc == pos
+
 insertWhite :: Triangle -> Board -> Int -> Board
 insertWhite tri [] acc = []
 insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == (position x) && isCheckerWhite x = ((Checker White (position x) (amount+2)):insertWhite tri xs (acc))
