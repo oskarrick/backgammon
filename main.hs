@@ -365,23 +365,23 @@ offTheBoardBlack (x:xs) | x == (Checker Black 0 1) = (Checker Black 0 1):offTheB
 validMoves :: Checkers -> [Int] -> Board -> Board
 validMoves checker dice board = if homeBoard checker board
                                   then checkerOptions checker board
-                                  else if checker == White
-                                  then validMovesWhite (checkerOptions checker board) dice board dice
-                                  else validMovesBlack (checkerOptions checker board) dice board dice
+                                  else (if checker == White
+                                  then validMovesWhite (checkerOptions White board) dice board dice
+                                  else validMovesBlack (checkerOptions Black board) dice board dice)
 
 validMovesBlack :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesBlack [] _ _ _ = []
 validMovesBlack (x:xs) [] board acc = validMovesBlack xs acc board acc
-validMovesBlack (x:xs) (die:dice) board acc | (position x+die) > 24 = validMovesBlack (x:xs) dice board acc
-                                            | validMove x (newCheckerPos2 (position x+die) board) = x:validMovesBlack xs acc board acc
-                                            | otherwise = validMovesWhite xs acc board acc
+validMovesBlack (x:xs) a@(die:dice) board acc | (position x+die) > 24 = validMovesBlack (x:xs) dice board acc
+                                              | (validMove x (newCheckerPos2 (position x+die) board)) = (x:(validMovesBlack xs acc board acc))
+                                              | otherwise = validMovesBlack (x:xs) dice board acc
 
 validMovesWhite :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesWhite [] _ _ _ = []
 validMovesWhite (x:xs) [] board acc = validMovesWhite xs acc board acc
 validMovesWhite (x:xs) (die:dice) board acc | (position x-die) < 1 = validMovesWhite (x:xs) dice board acc
                                             | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesWhite (xs) acc board acc
-                                            | otherwise = validMovesWhite (xs) acc board acc
+                                            | otherwise = validMovesWhite (x:xs) dice board acc
 
 validMovesOffBoard :: Checkers -> Board -> [Int] -> Board
 validMovesOffBoard checker board dice = if checker == Black
@@ -404,7 +404,6 @@ moveChecker checker dice a@(x:xs) = do
     then if checker == Black
           then start Black [] a else start White [] a
     else do
-
   if not (offTheBoard checker a == [])
     then do
       tri <- chooseChecker (offTheBoard checker a)
@@ -416,7 +415,9 @@ moveChecker checker dice a@(x:xs) = do
         then if checker == Black
           then start Black (deleteDie die dice) (insertBlack tri a (position tri+die))
           else start White (deleteDie die dice) (insertWhite tri a (position tri-die))
-        else moveChecker checker dice a
+        else do
+          putStrLn $ "Invalid move"
+          moveChecker checker dice a
     else do
   tri <- chooseChecker (validMoves checker dice a)
   die <- chooseDice dice
@@ -429,7 +430,9 @@ moveChecker checker dice a@(x:xs) = do
                     newPos <- newCheckerPos (position tri+die) a
                     if validMove tri newPos
                     then start Black (deleteDie die dice) (insertBlack tri a (position tri+die))
-                    else moveChecker checker dice a) ) )
+                    else do
+                      putStrLn $ "Invalid move"
+                      moveChecker checker dice a) ) )
     else (if homeBoard White a && (position tri-die) < 1
           then start checker (deleteDie die dice) (bearOff tri a)
           else (if (position tri-die < 1)
@@ -438,7 +441,9 @@ moveChecker checker dice a@(x:xs) = do
                     newPos <- newCheckerPos (position tri-die) a
                     if validMove tri newPos
                     then start White (deleteDie die dice) (insertWhite tri a (position tri-die))
-                    else moveChecker checker dice a)))
+                    else do
+                      putStrLn $ "Invalid move"
+                      moveChecker checker dice a)))
   --if validMove tri newPos
     --then if checker == Black
       --then main2 Black (deleteDie die dice) (insertBlack tri a (position tri+die))
@@ -485,9 +490,9 @@ newCheckerPos pos (x:xs) = do
 
 newCheckerPos2 :: Int -> Board -> Triangle
 newCheckerPos2 pos [] = (Empty 0 1)
-newCheckerPos2 pos (x:xs) = if not (pos == position x)
-                              then newCheckerPos2 pos xs
-                              else x
+newCheckerPos2 pos (x:xs) = if pos == position x
+                              then x
+                              else newCheckerPos2 pos xs
 
 validMove :: Triangle -> Triangle -> Bool
 validMove _ (Empty _ 1) = False
