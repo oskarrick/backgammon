@@ -315,25 +315,6 @@ homeBoard checker (x:xs) = if checker == Black
                               homeBoardBlack (x:xs) = if position x < 19 then False else True
                               homeBoardWhite (x:xs) = if position x > 6 then False else True
 
---canUseDie :: Checkers -> Int -> Triangle -> [Int] -> [Int]
-canUseDice :: Checkers -> Board -> Int -> [Int] -> [Int]
-canUseDice checker board die dice = if homeBoard checker board
-                                    then dice
-                                    else if checker == Black
-                                      then canUseDiceBlack (checkerOptions checker board) die dice
-                                      else canUseDiceWhite (reverse (checkerOptions checker board)) die dice
-
-canUseDiceBlack :: Board -> Int -> [Int] -> [Int]
-canUseDiceBlack [] _ dice = dice
-canUseDiceBlack (x:xs) die dice = if (position x+die) > 24
-                                    then (deleteDie die dice)
-                                    else canUseDiceBlack xs die dice
-
-canUseDiceWhite :: Board -> Int -> [Int] -> [Int]
-canUseDiceWhite [] _ dice = dice
-canUseDiceWhite (x:xs) die dice = if (position x-die) < 1
-                                    then (deleteDie die dice)
-                                    else dice
 {-
 possibleMoves :: Checkers -> [Int] -> Triangle -> Board -> Board
 possibleMoves checker [] tri board = []
@@ -390,12 +371,12 @@ validMovesOffBoard checker board dice = if checker == Black
 
 validMovesOffBoardWhite :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesOffBoardWhite [] _ _ _ = []
-validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesOffBoardWhite xs acc board acc
+validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:validMovesOffBoardWhite xs dice board acc
                                                     | otherwise = validMovesOffBoardWhite xs dice board acc
 
 validMovesOffBoardBlack :: Board -> [Int] -> Board -> [Int] -> Board
 validMovesOffBoardBlack [] _ _ _ = []
-validMOvesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x+die) board) = x:validMovesOffBoardBlack xs acc board acc
+validMOvesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x+die) board) = x:validMovesOffBoardBlack xs dice board acc
                                                     | otherwise = validMovesOffBoardBlack xs dice board acc
 
 moveChecker :: Checkers -> [Int] -> Board -> IO ()
