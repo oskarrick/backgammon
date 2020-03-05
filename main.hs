@@ -371,8 +371,8 @@ validMovesOffBoard checker board dice = if checker == Black
                                           else validMovesOffBoardWhite (offTheBoard checker board) dice board dice
 
 validMovesOffBoardWhite :: Board -> [Int] -> Board -> [Int] -> Board
-validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x
-                                                    | validMove x (newCheckerPos2 (position x-(head dice)) board) = x
+validMovesOffBoardWhite (x:xs) (die:dice) board acc | validMove x (newCheckerPos2 (position x-die) board) = x:[]
+                                                    | validMove x (newCheckerPos2 (position x-(head dice)) board) = x:[]
                                                     | otherwise = []
 
 validMovesOffBoardBlack :: Board -> [Int] -> Board -> [Int] -> Board
