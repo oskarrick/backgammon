@@ -244,10 +244,9 @@ position (Empty pos _) = pos
 
 {-
 checkerOptions checkers board
-Checks which checkers (for aare on the board and where they are
+Checks which checkers (for a give color) are on the board and where they are
 PRE:  ... precondition on the arguments, if any ...
-RETURNS: ... description of the result, in terms of the arguments ...
-SIDE EFFECTS: ... side effects, if any, including exceptions ...
+RETURNS: a board with every Triangle with checkers as color
 EXAMPLES: ... especially if useful to highlight delicate issues; also consider including counter-examples ...
 -}
 checkerOptions :: Checkers -> Board -> Board
@@ -259,6 +258,12 @@ checkerOptions a@Black (x:xs) = if isCheckerBlack x
                                 then x :(checkerOptions a xs)
                                 else checkerOptions a xs
 
+{- chooseChecker board
+   Chooses a checker (Triangle) and returns it
+   RETURNS: A Triangle from the Board board
+   SIDE EFFECTS: Prints strings and accepts inputs
+
+-}
 chooseChecker :: Board -> IO Triangle
 chooseChecker chkrs = do
   putStrLn ("Moveable checkers:")
@@ -399,7 +404,7 @@ moveChecker checker dice a@(x:xs) = do
                   else newCheckerPos (position tri-die) a
       if validMove tri newPos
         then if checker == Black
-          then start Black (deleteDie die dice) (insertBlack tri a (position tri+die))
+          then start Black (deleteDie die dice) (insertBlack tri a (position newPos))
           else start White (deleteDie die dice) (insertWhite tri a newPos)
         else do
           putStrLn $ "INVALID MOVE"
@@ -461,9 +466,11 @@ insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == x && isCheckerW
 
 insertBlack :: Triangle -> Board -> Int -> Board
 insertBlack tri [] acc = []
-insertBlack tri ((Empty pos _):xs) 1 = (Checker Black pos 1):xs
-insertBlack tri ((Checker checker2 pos amount):xs) 1 | Black == checker2 = (Checker Black pos (amount+1)):xs
-                                                     | White == checker2 = (Checker Black pos 1):xs ++ [(Checker White 25 1)]
+--insertBlack tri@(Checker checker pos amount) (x:xs) acc | acc == x && inCheckerBlack x = ((checkerAmountPlus x):)
+
+insertBlack tri ((Empty pos _):xs) 1 = (Checker Black pos 1):insertBlack tri xs (0)
+insertBlack tri ((Checker checker2 pos amount):xs) 1 | Black == checker2 = (Checker Black pos (amount+1)):(insertBlack tri xs 0)
+                                                     | White == checker2 = (Checker Black pos 1):(insertBlack tri xs 0) ++ [(Checker White 25 1)]
                                                      | otherwise = (Checker Black pos 1):xs
 insertBlack tri@(Checker checker2 pos amount) (x:xs) acc | tri == x && amount < 2 = (Empty pos 0):(insertBlack tri xs (acc-1))
                                                          | tri == x = (Checker checker2 pos (amount-1)):(insertBlack tri xs (acc-1))
