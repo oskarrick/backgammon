@@ -118,10 +118,10 @@ start checkers moves board = do
   if winCheck board checkers
     then if checkers == Black
           then do
-            putStrLn ("Black wins!")
+            putStrLn ("BLACK WINS!")
             main
           else do
-            putStrLn ("White wins!")
+            putStrLn ("WHITE WINS!")
             main
     else do
     if moves == [] then do
