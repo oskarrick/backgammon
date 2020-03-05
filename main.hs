@@ -97,10 +97,12 @@ startGame = do
     _ <- getLine
     putStrLn (show number2)
     moves <- calculateMoves
-    if number1 > number2 then
-        start White moves newGameState
-    else if number2 > number1 then
-        start Black moves newGameState
+    if number1 > number2 then do
+      putStrLn ("White starts!")
+      start White moves newGameState
+    else if number2 > number1 then do 
+      putStrLn ("Black starts!")
+      start Black moves newGameState
     else startGame
 
 {-
