@@ -1,6 +1,7 @@
 import System.Random
 import System.IO
 import Data.List
+import Test.HUnit
 
 {-
 ... description of what the data type represents ...
@@ -245,9 +246,8 @@ position (Empty pos _) = pos
 {-
 checkerOptions checkers board
 Checks which checkers (for a give color) are on the board and where they are
-PRE:  ... precondition on the arguments, if any ...
 RETURNS: a board with every Triangle with checkers as color
-EXAMPLES: ... especially if useful to highlight delicate issues; also consider including counter-examples ...
+EXAMPLES:
 -}
 checkerOptions :: Checkers -> Board -> Board
 checkerOptions _ [] = []
@@ -321,21 +321,7 @@ homeBoard checker (x:xs) = if checker == Black
                               homeBoardBlack (x:xs) = if position x < 19 then False else True
                               homeBoardWhite (x:xs) = if position x > 6 then False else True
 
-{-
-possibleMoves :: Checkers -> [Int] -> Triangle -> Board -> Board
-possibleMoves checker [] tri board = []
-possibleMoves checker dice@(x:xs) tri board = if checker == Black
-                                                then (if position tri + x > 24
-                                                        then possibleMoves checker xs tri board
-                                                        else (if validMove tri (newCheckerPos2 (position tri+x) board)
-                                                                then newCheckerPos2 (position tri+x) board:possibleMoves checker xs tri board
-                                                                else possibleMoves checker xs tri board))
-                                                else (if position tri-x < 1
-                                                        then possibleMoves checker xs tri board
-                                                        else (if validMove tri (newCheckerPos2 (position tri-x) board)
-                                                        then (newCheckerPos2 (position tri-x) board):possibleMoves checker xs tri board
-                                                        else possibleMoves checker xs tri board))
--}
+
 offTheBoard :: Checkers -> Board -> Board
 offTheBoard checker board = if checker == Black then offTheBoardBlack board else offTheBoardWhite board
 
@@ -437,11 +423,7 @@ moveChecker checker dice a@(x:xs) = do
                     else do
                       putStrLn $ "INVALID MOVE"
                       moveChecker checker dice a)))
-  --if validMove tri newPos
-    --then if checker == Black
-      --then main2 Black (deleteDie die dice) (insertBlack tri a (position tri+die))
-      --else main2 White (deleteDie die dice) (insertWhite tri a (position tri-die))
-    --else moveChecker checker dice a
+
 
 bearOff :: Triangle -> Board -> Board
 bearOff tri [] = []
@@ -466,8 +448,6 @@ insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == x && isCheckerW
 
 insertBlack :: Triangle -> Board -> Int -> Board
 insertBlack tri [] acc = []
---insertBlack tri@(Checker checker pos amount) (x:xs) acc | acc == x && inCheckerBlack x = ((checkerAmountPlus x):)
-
 insertBlack tri ((Empty pos _):xs) 1 = (Checker Black pos 1):insertBlack tri xs (0)
 insertBlack tri ((Checker checker2 pos amount):xs) 1 | Black == checker2 = (Checker Black pos (amount+1)):(insertBlack tri xs 0)
                                                      | White == checker2 = (Checker Black pos 1):(insertBlack tri xs 0) ++ [(Checker White 25 1)]
@@ -500,3 +480,14 @@ validMove (Checker White _ _) (Checker check pos amount) | White == check = True
 validMove (Checker Black _ _) (Checker check pos amount) | Black == check = True
                                                          | White == check && amount < 2 = True
                                                          | otherwise = False
+
+
+
+test1 = TestCase $ assertEqual "ValidMove (Checker White 1 2) (Empty 3 0)" True (validMove (Checker White 1 2) (Empty 3 0))
+
+test2 = TestCase $ assertEqual "insertBlack" [Checker Black 1 1,Empty 2 0,Checker Black 3 1,Empty 4 0,Empty 5 0,Checker White 6 5,Empty 7 0,Checker White 8 3,Empty 9 0,Empty 10 0,Empty 11 0,Checker White 12 5,Checker Black 13 5,Empty 14 0,Empty 15 0,Empty 16 0,Checker Black 17 3,Empty 18 0,Checker Black 19 5,Empty 20 0,Empty 21 0,Empty 22 0,Empty 23 0,Checker White 24 2] (insertBlack (Checker Black 1 2) newGameState 3)
+
+--test3 = TestCase $ assertEqual "insertWhite" 
+
+-- for running all the tests
+runtests = runTestTT $ TestList [test1, test2]
