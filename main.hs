@@ -417,7 +417,7 @@ moveChecker checker dice a@(x:xs) = do
       if validMove tri newPos
         then if checker == Black
           then start Black (deleteDie die dice) (insertBlack tri a (position tri+die))
-          else start White (deleteDie die dice) (insertWhite tri a (position tri-die))
+          else start White (deleteDie die dice) (insertWhite tri a newPos)
         else do
           putStrLn $ "Invalid move"
           moveChecker checker dice a
@@ -439,11 +439,13 @@ moveChecker checker dice a@(x:xs) = do
     else (if homeBoard White a && (position tri-die) < 1
           then start checker (deleteDie die dice) (bearOff tri a)
           else (if (position tri-die < 1)
-                  then moveChecker checker dice a
+                  then do
+                    putStrLn $ "Invalid move"
+                    moveChecker checker dice a
                   else (do
                     newPos <- newCheckerPos (position tri-die) a
                     if validMove tri newPos
-                    then start White (deleteDie die dice) (insertWhite tri a (position tri-die))
+                    then start White (deleteDie die dice) (insertWhite tri a newPos)
                     else do
                       putStrLn $ "Invalid move"
                       moveChecker checker dice a)))
@@ -462,12 +464,14 @@ bearOff tri@(Checker checker pos amount) (x:xs) | tri == x && amount < 2 = (Empt
 deleteDie :: Int -> [Int] -> [Int]
 deleteDie die (x:xs) = if die == x then xs else x:deleteDie die xs
     --acc == pos
+checkerAmountPlus :: Triangle -> Triangle
+checkerAmountPlus (Checker a b c) = (Checker a b (c+1))
 
-insertWhite :: Triangle -> Board -> Int -> Board
+insertWhite :: Triangle -> Board -> Triangle -> Board
 insertWhite tri [] acc = []
-insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == (position x) && isCheckerWhite x = ((Checker White (position x) (amount+2)):insertWhite tri xs (acc))
-                                                        | acc == (position x) && isCheckerBlack x = ((Checker White (position x) 1):insertWhite tri xs acc) ++ [(Checker Black 0 1)]
-                                                        | acc == (position x) = ((Checker White (position x) 1):insertWhite tri xs (acc))
+insertWhite tri@(Checker checker pos amount) (x:xs) acc | acc == x && isCheckerWhite x = ((checkerAmountPlus x):insertWhite tri xs (acc))
+                                                        | acc == x && isCheckerBlack x = ((Checker White (position x) 1):insertWhite tri xs acc) ++ [(Checker Black 0 1)]
+                                                        | acc == x = ((Checker White (position x) 1):insertWhite tri xs (acc))
                                                         | tri == x && amount < 2 = (Empty (position tri) 0):xs
                                                         | tri == x = (Checker checker pos (amount-1)):xs
                                                         | otherwise = x:insertWhite tri xs acc
