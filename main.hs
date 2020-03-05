@@ -404,9 +404,6 @@ moveChecker checker dice a@(x:xs) = do
     then if checker == Black
           then start Black [] a else start White [] a
     else do
-  putStrLn $ "Your checkers:"
-  printGameState (checkerOptions checker a)
-  putStrLn ("")
 
   if not (offTheBoard checker a == [])
     then do
