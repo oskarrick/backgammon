@@ -97,10 +97,12 @@ startGame = do
     _ <- getLine
     putStrLn (show number2)
     moves <- calculateMoves
-    if number1 > number2 then
-        start White moves newGameState
-    else if number2 > number1 then
-        start Black moves newGameState
+    if number1 > number2 then do
+      putStrLn ("White starts!\n")
+      start White moves newGameState
+    else if number2 > number1 then do
+      putStrLn ("Black starts!\n")
+      start Black moves newGameState
     else startGame
 
 {-
@@ -130,7 +132,7 @@ start checkers moves board = do
             printGameState board
             putStrLn ("")
             putStrLn (show checkers ++ "'s turn")
-            putStrLn ("Moves: " ++ show moves)
+            putStrLn ("Moves: " ++ show moves ++ "\n")
             moveChecker checkers moves board
 
 {-
@@ -168,7 +170,7 @@ EXAMPLES:
 -}
 chooseDice :: [Int] -> IO Int
 chooseDice moves = do
-  putStrLn $ "Choose a dice \n"++show moves
+  putStrLn $ "Choose a die \n"++show moves
   dice <- getLine
   if dice == ""
     then chooseDice moves
@@ -259,8 +261,9 @@ checkerOptions a@Black (x:xs) = if isCheckerBlack x
 
 chooseChecker :: Board -> IO Triangle
 chooseChecker chkrs = do
-  putStrLn $ "Choose a checker (1-" ++ show (length chkrs) ++")"
+  putStrLn ("Moveable checkers:")
   printGameState chkrs
+  putStrLn $ "\nChoose a checker (1-" ++ show (length chkrs) ++")"
   checker <- getLine
   if checker == ""
     then chooseChecker chkrs
@@ -397,13 +400,13 @@ validMOvesOffBoardBlack (x:xs) (die:dice) board acc | validMove x (newCheckerPos
 
 moveChecker :: Checkers -> [Int] -> Board -> IO ()
 moveChecker checker dice a@(x:xs) = do
-  print dice
   if dice == [] || (validMoves checker dice a) == [] || (not (offTheBoard checker a==[]) && (validMovesOffBoard checker a dice == []) )
     then if checker == Black
           then start Black [] a else start White [] a
     else do
-  putStrLn $ "Your checkers"
+  putStrLn $ "Your checkers:"
   printGameState (checkerOptions checker a)
+  putStrLn ("")
 
   if not (offTheBoard checker a == [])
     then do
